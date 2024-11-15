@@ -25,39 +25,14 @@ cursor.execute(
 )
 conexion.commit()
 
-##clase
 
-class Anime:
-    def __init__(self, id, titulo, resumen, director, categoria, año, episodios, rating, precio, stock):
-        self.id = id
-        self.titulo = titulo
-        self.resumen = resumen
-        self.director = director
-        self.categoria = categoria
-        self.año = año
-        self.episodios = episodios
-        self.rating = rating
-        self.precio = precio
-        self.stock = stock
-
-    def __str__(self):
-        return f"ID: {self.id} \nTitulo: {self.titulo} \nResumen: {self.resumen} \nDirector: {self.director} \nCategoria: {self.categoria} \nAño: {self.año} \nEpisodios: {self.episodios} \nRating: {self.rating}\nPrecio: {self.precio} \nStock: {self.stock}"
-
-    def verInfo(self):
-        print(f'''
-        ID: {self.id}
-        Titulo: {self.titulo}
-        Resumen: {self.resumen}
-        Director: {self.director}
-        Categoria: {self.categoria}
-        Año estreno: {self.año}
-        Episodios: {self.episodios}
-        Rating: {self.rating}
-        Precio: {self.precio}
-        ''')
+##Diccionario
 
 listaAnime = {}
 
+## METODOS FUNCIONES
+
+##GET 
 def VerListado():
     cursor.execute('SELECT * FROM anime')
     animes = cursor.fetchall()
@@ -88,7 +63,7 @@ def VerListado():
                 print(f"{key.capitalize()}: {value}")
             print("\n")
 
-
+##CREATE
 def agregarAnime():
     
     titulo = input("Ingrese titulo: ")
@@ -107,6 +82,9 @@ def agregarAnime():
     
     print("Nuevo anime agregado exitosamente")
 
+
+##CATEGORIAS GET
+
 def listarCategorias():
      cursor.execute('SELECT categoria, COUNT(*) FROM anime GROUP BY categoria')
      categorias = cursor.fetchall()
@@ -121,7 +99,7 @@ def listarCategorias():
                  
      
           
-##Modifica registros       
+##Modifica registros, UPDATE       
 
 def modificarAnime():
     animeABuscar = input("Ingrese el nombre del anime a modificar: ").lower()
@@ -139,7 +117,7 @@ def modificarAnime():
         nuevo_episodios = input("Modifique la cantidad de episodios: ")
         nuevo_rating = input("Modifique el rating: ")
         nuevo_precio = float(input("Ingrese nuevo precio: "))
-        nuevo_stock = int(input("Ingrese nuevo stock"))
+        nuevo_stock = int(input("Ingrese nuevo stock: "))
         
         cursor.execute("""
             UPDATE anime SET titulo = ?, resumen = ?, director = ?, categoria = ?, año = ?, episodios = ?, rating = ?, precio = ?, stock = ?
@@ -152,7 +130,7 @@ def modificarAnime():
     else:
         print("No se ha encontrado anime con ese nombre")
 
-
+##GET
 
 def buscarAnime():  
      
@@ -167,7 +145,7 @@ def buscarAnime():
      
 
 
-
+##DELETE
 def eliminarAnime():
      try:
           animeEliminar = int(input("Introduce el ID del anime que quieres eliminar: "))
@@ -184,7 +162,8 @@ def eliminarAnime():
           print("El ID siempre es un numero entero")
           
           
-          
+##GET ORDENADO ALFABETICAMENTE
+         
 def listarSorted():
            cursor.execute('SELECT * FROM anime ORDER BY titulo ')
            animes = cursor.fetchall()
@@ -192,8 +171,33 @@ def listarSorted():
           
            for anime in animes:
                print(f"ID: {anime[0]}, Titulo: {anime[1]}, Resumen: {anime[2]}, Director: {anime[3]}, Categoria:  {anime[4]}, Año: {anime[5]}, Episodios: {anime[6]}, Rating: {anime[7]}, Precio: {anime[8]}\, Stock: {anime[9]}n")
+
+##GET DE UN ATRIBUTO MENOR A UN MUMERO
           
+def generarReporteBajoStock():
+     cursor.execute('SELECT * FROM anime WHERE stock <=3 ORDER BY titulo ')
+     animes = cursor.fetchall()
+     
+     print("***** Lista de animes con stock menor a 3 unidades ***** \n")
+     print("**** ALERTA BAJO STOCK **** \n ")
+     if animes: 
+         
+          for anime in animes:   
+               print(print(f"ID: {anime[0]}, Titulo: {anime[1]}, Resumen: {anime[2]}, Director: {anime[3]}, Categoria:  {anime[4]}, Año: {anime[5]}, Episodios: {anime[6]}, Rating: {anime[7]}, Precio: {anime[8]}\, Stock: {anime[9]}\n"))
+     else:
+          print("No se han encontrado animes con bajo stock")
+
+def verStockActual():
+          cursor.execute('SELECT titulo, stock FROM anime')
+          stock = cursor.fetchall()
           
+          if stock:
+               print("***** STOCK ACTUAL DE PRODUCTOS ******* \n")
+               for anime in stock:
+                    print(print(f"Titulo: {anime[0]}, Stock: {anime[1]}\n"))
+          else:
+               print("No se han encontrado animes sin stock")
+
      
 ##Menu
 
@@ -208,10 +212,12 @@ while True:
           print("5. Eliminar anime ")
           print("6. Modificar registro")
           print("7. Listar animes ordenados alfabeticamente")
-          print("8. Salir")
+          print("8. Consulta animes con bajo stock")
+          print("9. Ver stock actual de productos: ")
+          print("10. Salir")
           
 
-          opcion = int(input("Ingrese opcion:"))
+          opcion = int(input("Ingrese opcion: "))
 
           if opcion == 1:
                agregarAnime()
@@ -228,6 +234,10 @@ while True:
           elif opcion == 7:
                listarSorted()
           elif opcion == 8:
+               generarReporteBajoStock()
+          elif opcion == 9:
+               verStockActual()
+          elif opcion == 10:
                print("Has salido del sistema. Adios.")
                conexion.close()
                exit()
