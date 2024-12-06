@@ -1,36 +1,11 @@
-import sqlite3
 
-##conexion a la database
-
-conexion = sqlite3.connect('anime.db')
-cursor = conexion.cursor()
-
-cursor.execute(
-     
-     '''
-     CREATE TABLE IF NOT EXISTS anime(
-     id INTEGER PRIMARY KEY AUTOINCREMENT,  
-     titulo TEXT CHECK(length(titulo) <= 100),  
-     resumen TEXT CHECK(length(resumen) <= 300),  
-     director TEXT CHECK(length(director) <= 50), 
-     categoria TEXT,
-     año INTEGER,
-     episodios INTEGER,
-     rating REAL,
-     precio REAL,
-     stock INTEGER
-);
-     
-     '''
-)
-conexion.commit()
-
+from servicios.conexion_bd import *
 
 ##Diccionario
 
 listaAnime = {}
 
-## METODOS FUNCIONES
+## METODOS FUNCIONES TODAS
 
 ##GET 
 def VerListado():
@@ -99,7 +74,7 @@ def listarCategorias():
                  
      
           
-##Modifica registros, UPDATE       
+##Modifica registros, UPDATE, set       
 
 def modificarAnime():
     animeABuscar = input("Ingrese el nombre del anime a modificar: ").lower()
@@ -187,64 +162,18 @@ def generarReporteBajoStock():
      else:
           print("No se han encontrado animes con bajo stock")
 
+##Ver stock
+
 def verStockActual():
           cursor.execute('SELECT titulo, stock FROM anime')
           stock = cursor.fetchall()
           
           if stock:
-               print("***** STOCK ACTUAL DE PRODUCTOS ******* \n")
-               for anime in stock:
-                    print(print(f"Titulo: {anime[0]}, Stock: {anime[1]}\n"))
+            
+              print("***** STOCK ACTUAL DE PRODUCTOS ******* \n")
+             
+              for anime in stock:
+                    print(f"Titulo: {anime[0]}, Stock: {anime[1]}\n")
           else:
                print("No se han encontrado animes sin stock")
-
-     
-##Menu
-
-while True:
-
-     try:
-          print(" ***** Menu de opciones ***** ")
-          print("1. Agregar nuevo anime ")
-          print("2. Listar animes")
-          print("3. Listar categorias")
-          print("4. Buscar anime")
-          print("5. Eliminar anime ")
-          print("6. Modificar registro")
-          print("7. Listar animes ordenados alfabeticamente")
-          print("8. Consulta animes con bajo stock")
-          print("9. Ver stock actual de productos: ")
-          print("10. Salir")
-          
-
-          opcion = int(input("Ingrese opcion: "))
-
-          if opcion == 1:
-               agregarAnime()
-          elif opcion == 2:
-               VerListado()
-          elif opcion == 3:
-               listarCategorias()
-          elif opcion == 4:
-               buscarAnime()
-          elif opcion == 5:
-               eliminarAnime()
-          elif opcion == 6:
-               modificarAnime()
-          elif opcion == 7:
-               listarSorted()
-          elif opcion == 8:
-               generarReporteBajoStock()
-          elif opcion == 9:
-               verStockActual()
-          elif opcion == 10:
-               print("Has salido del sistema. Adios.")
-               conexion.close()
-               exit()
-          else:
-               print("Opcion no valida")
-
-     except (ValueError):
-          print("Debe ingresar solo numeros enteros")
-          
 
